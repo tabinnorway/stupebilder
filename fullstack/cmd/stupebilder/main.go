@@ -1,11 +1,16 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"os"
-	"strings"
 	"time"
+
+	"database/sql"
+
+	"github.com/joho/godotenv"
+	_ "github.com/lib/pq" // PostgreSQL driver
 
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/chi/v5"
@@ -16,35 +21,39 @@ import (
 	"github.com/tabinnorway/stupebilder/services/home"
 	"github.com/tabinnorway/stupebilder/services/images"
 	"github.com/tabinnorway/stupebilder/services/thumbs"
+	"github.com/tabinnorway/stupebilder/services/users"
 )
 
-var PORT = ":3001"
 var IMG_ROOT = "/mnt/familyshare/images"
 var HOME_BASE = "/home/tberg/dev.p/bstk/stupebilder.no/fullstack"
 
+func createConnectionString() string {
+	dbUser := os.Getenv("DB_USER")
+	dbPassword := os.Getenv("DB_PASSWORD")
+	dbName := os.Getenv("DB_NAME")
+	dbHost := os.Getenv("DB_HOST")
+	dbPort := os.Getenv("DB_PORT")
+	connStr := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable",
+		dbUser, dbPassword, dbHost, dbPort, dbName,
+	)
+	return connStr
+}
+
 func main() {
-	toDir := HOME_BASE
-	ex, err := os.Executable()
+	err := godotenv.Load()
 	if err != nil {
-		panic(err)
+		log.Fatal("Error loading .env file")
 	}
-	log.Printf("Executable is %s", ex)
-	if strings.Contains(ex, "/bin/") {
-		index := strings.Index(ex, "/bin/")
-		if index != -1 {
-			// Slice the string up to the start of the substring plus its length
-			toDir = ex[:index+len("/bin/")]
-		}
-		toDir = toDir[:index]
-	}
-	log.Printf("Changing directory to %s", toDir)
-	err = os.Chdir(toDir)
+
+	db, err := sql.Open("postgres", createConnectionString())
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
+	defer db.Close()
 
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
+	r.Use(mw.UrlSanitizerMiddleware())
 	r.Use(mw.CheckCookieMiddleware("bstkpasskey"))
 	r.Use(middleware.Timeout(60 * time.Second))
 	r.Use(cors.Handler(cors.Options{
@@ -58,14 +67,17 @@ func main() {
 		MaxAge:           300, // Maximum value not ignored by any of major browsers
 	}))
 
-	r.Route("/", home.NewHandler().RegisterRoutes)
+	r.Route("/", home.NewHandler(db).RegisterRoutes)
 	r.Route("/albums", albums.NewHandler(IMG_ROOT).RegisterRoutes)
 	r.Route("/folders", folders.NewHandler(IMG_ROOT).RegisterRoutes)
 	r.Route("/thumbs", thumbs.NewHandler(IMG_ROOT).RegisterRoutes)
 	r.Route("/images", images.NewHandler(IMG_ROOT).RegisterRoutes)
+	r.Route("/users", users.NewHandler(db).RegisterRoutes)
 
-	log.Printf("Listening to %s", PORT)
-	err = http.ListenAndServe(PORT, r)
+	listenPort := fmt.Sprintf(":%s", os.Getenv("LISTEN_PORT"))
+
+	log.Printf("Listening to %s", listenPort)
+	err = http.ListenAndServe(listenPort, r)
 	if err != nil {
 		log.Panic(err)
 	}

@@ -57,8 +57,10 @@ func (h *Handler) getFolders(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	albumInfo := utils.GetAlbumInfo(filepath.Join(h.imgRoot, albumId))
+
 	data := utils.PageData{
-		Title:  albumId,
+		Title:  albumInfo.Title,
 		Album:  albumId,
 		Folder: "",
 		Files:  directories,

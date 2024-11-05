@@ -3,11 +3,10 @@
     {{range .Files}}
     <a href="{{$.Album}}/{{.Name}}">
         <div class="folder-icon">
-            <div class="header"></div>
+            <div class="header" style="color: white; font-weight: bold;">{{.Name}}</div>
             <div class="content" style="background-image: url('/thumbs/{{$.Album}}/{{.Name}}');background-size: cover;background-position: top;">
             </div>
             <div class="footer">
-                {{.Name}}
             </div>
         </div>
     </a>

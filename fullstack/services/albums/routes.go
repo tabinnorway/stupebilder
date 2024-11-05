@@ -3,6 +3,7 @@ package albums
 import (
 	"net/http"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/go-chi/chi/v5"
@@ -31,16 +32,18 @@ func (h *Handler) getAlbums(w http.ResponseWriter, r *http.Request) {
 		utils.WriteError(w, http.StatusNotFound, nil)
 	}
 	for _, entry := range entries {
-		files = append(files, utils.FileInfo{
-			Name:  entry.Name(),
-			IsDir: entry.IsDir(),
-		})
+		if !strings.HasPrefix(entry.Name(), ".") && entry.IsDir() {
+			albumInfo := utils.GetAlbumInfo(filepath.Join(foldersPath, entry.Name()))
+			files = append(files, utils.FileInfo{
+				Title:    albumInfo.Title,
+				Date:     albumInfo.Date,
+				Location: albumInfo.Location,
+				Name:     entry.Name(),
+				IsDir:    entry.IsDir(),
+			})
+		}
 	}
 
-	filterFunc := func(s utils.FileInfo) bool {
-		return s.IsDir && !strings.HasPrefix(s.Name, ".")
-	}
-	files = utils.Filter(files, filterFunc)
 	data := utils.PageData{
 		Title:  "Albums",
 		Album:  "",

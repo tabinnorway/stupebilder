@@ -1,12 +1,15 @@
 {{ define "content" }}
+Albums
 <div style="display: flex;flex-flow: row wrap; justify-content: space-around;">
     {{range .Files}}
     <a href="/folders/{{.Name}}">
         <div class="folder-icon">
-            <div class="header"></div>
+            <div class="header" style="color: white">
+                {{.Title}}
+            </div>
             <div class="content" style="background-image: url('/thumbs/{{.Name}}');;background-size: cover;"></div>
             <div class="footer">
-                {{.Name}}
+                {{.Date}}
             </div>
         </div>
     </a>

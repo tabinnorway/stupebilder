@@ -214,8 +214,11 @@ func Filter[T any](ss []T, test func(T) bool) (ret []T) {
 }
 
 type FileInfo struct {
-	Name  string
-	IsDir bool
+	Title    string
+	Date     string
+	Location string
+	Name     string
+	IsDir    bool
 }
 
 type PageData struct {
@@ -225,8 +228,31 @@ type PageData struct {
 	Files  []FileInfo
 }
 
+type AlbumInfo struct {
+	Title    string
+	Location string
+	Date     string
+}
+
 func FindAlbumThub(albumPath string) string {
 	return filepath.Join(albumPath, "thumb.jpg")
+}
+
+func GetAlbumInfo(path string) *AlbumInfo {
+	albumInfo := new(AlbumInfo)
+	path = filepath.Join(path, "albuminfo.json")
+	file, err := os.Open(path)
+	if err != nil {
+		fmt.Println("Error opening file:", err)
+	}
+	defer file.Close()
+
+	decoder := json.NewDecoder(file)
+	if err := decoder.Decode(&albumInfo); err != nil {
+		fmt.Println("Error decoding JSON:", err)
+		return albumInfo
+	}
+	return albumInfo
 }
 
 func FindFolderThumb(albumPath string, folderName string) string {
