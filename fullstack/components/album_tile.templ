@@ -1,0 +1,23 @@
+package components
+
+import (
+    "fmt"
+    "github.com/tabinnorway/stupebilder/models"
+)
+
+
+templ AlbumTile(album *models.Album) {
+    <a class="invisi-a" href={
+        templ.URL(fmt.Sprintf("/albums/%s/folders", album.Id))
+    }>
+        <div style="" class="album-card">
+            <header>
+                <div>{album.Title}</div>
+            </header>
+            <article>
+                <img src={ fmt.Sprintf("/albums/%s/thumb", album.Id)} />
+            </article>
+            <footer>{album.Datestring.String}</footer>
+        </div>
+    </a>
+}

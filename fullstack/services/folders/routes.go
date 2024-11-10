@@ -1,34 +1,49 @@
 package folders
 
 import (
+	"database/sql"
 	"fmt"
 	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/tabinnorway/stupebilder/interfaces"
+	"github.com/tabinnorway/stupebilder/models"
 	"github.com/tabinnorway/stupebilder/utils"
+	"github.com/tabinnorway/stupebilder/views"
 )
 
 type Handler struct {
-	imgRoot string
+	albumStore  interfaces.AlbumStore
+	folderStore interfaces.FolderStore
 }
 
-func NewHandler(imgRoot string) *Handler {
-	return &Handler{imgRoot: imgRoot}
+func NewHandler(as interfaces.AlbumStore, fs interfaces.FolderStore) *Handler {
+	return &Handler{albumStore: as, folderStore: fs}
 }
 
 func (h *Handler) RegisterRoutes(r chi.Router) {
-	r.Get("/{albumId}", h.getFolders)
-	r.Get("/{albumId}/{folderId}", h.getfolderByName)
+	r.Get("/{albumId}/{folderId}", h.getFolderById)
 	r.Get("/{albumId}/{folderId}/download", h.downloadZip)
 }
 
 func (h *Handler) downloadZip(w http.ResponseWriter, r *http.Request) {
 	albumId := chi.URLParam(r, "albumId")
 	folderId := chi.URLParam(r, "folderId")
-	foldersPath := filepath.Join(h.imgRoot, albumId, "images", folderId)
+	if len(albumId) <= 0 || len(folderId) <= 0 {
+		utils.WriteError(w, http.StatusBadRequest, nil)
+		return
+	}
+	album, err := h.albumStore.GetByID(albumId)
+	if err != nil {
+		utils.WriteError(w, http.StatusNotFound, nil)
+		return
+	}
+
+	foldersPath := filepath.Join(album.AlbumFolder, "images", folderId)
 	zipFile := filepath.Join(foldersPath, "images.zip")
 	if _, err := os.Stat(zipFile); err == nil {
 		contentDisposition := fmt.Sprintf("attachment; filename=%s-images.zip", folderId)
@@ -36,64 +51,44 @@ func (h *Handler) downloadZip(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, zipFile)
 		return
 	}
-	utils.RenderTemplate(w, "not_yet_ready.html", utils.PageData{})
+	utils.WriteError(w, http.StatusNotFound, nil)
 }
 
-func (h *Handler) getFolders(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) getFolderById(w http.ResponseWriter, r *http.Request) {
 	albumId := chi.URLParam(r, "albumId")
-	foldersPath := filepath.Join(h.imgRoot, albumId, "images")
+	folderId := chi.URLParam(r, "folderId")
 
-	var directories []utils.FileInfo
+	if len(albumId) <= 0 || len(folderId) <= 0 {
+		utils.WriteError(w, http.StatusBadRequest, nil)
+		return
+	}
+
+	album, err := h.albumStore.GetByID(albumId)
+	if err != nil {
+		utils.WriteError(w, http.StatusNotFound, nil)
+		return
+	}
+	foldersPath := filepath.Join(album.AlbumFolder, "images", folderId)
+	folder := models.Folder{Id: folderId, Title: folderId}
+	fmt.Println(foldersPath)
 	entries, err := os.ReadDir(foldersPath)
 	if err != nil {
 		utils.WriteError(w, http.StatusNotFound, nil)
+		return
 	}
+
+	var images []models.Image
 	for _, entry := range entries {
-		if entry.IsDir() && !strings.HasPrefix(entry.Name(), ".") {
-			directories = append(directories, utils.FileInfo{
-				Name:  entry.Name(),
-				IsDir: entry.IsDir(),
+		if strings.HasSuffix(entry.Name(), "jpg") && !strings.HasPrefix(entry.Name(), ".") {
+			images = append(images, models.Image{
+				Id:        entry.Name(),
+				CreatedAt: time.Now(),
+				UpdatedAt: sql.NullTime{Valid: false},
+				Title:     entry.Name(),
+				Date:      "",
+				FileName:  entry.Name(),
 			})
 		}
 	}
-
-	albumInfo := utils.GetAlbumInfo(filepath.Join(h.imgRoot, albumId))
-
-	data := utils.PageData{
-		Title:  albumInfo.Title,
-		Album:  albumId,
-		Folder: "",
-		Files:  directories,
-	}
-	utils.RenderTemplate(w, "folders.html", data)
-}
-
-func (h *Handler) getfolderByName(w http.ResponseWriter, r *http.Request) {
-	templateName := "folder.html"
-	albumId := chi.URLParam(r, "albumId")
-	folderId := chi.URLParam(r, "folderId")
-	foldersPath := filepath.Join(h.imgRoot, albumId, "images", folderId)
-	entries, err := os.ReadDir(foldersPath)
-	if err != nil {
-		utils.WriteError(w, http.StatusNotFound, nil)
-	}
-
-	var files []utils.FileInfo
-	for _, entry := range entries {
-		files = append(files, utils.FileInfo{
-			Name:  entry.Name(),
-			IsDir: entry.IsDir(),
-		})
-	}
-	filterFunc := func(s utils.FileInfo) bool {
-		return !s.IsDir && !strings.HasPrefix(s.Name, ".") && !strings.HasSuffix(s.Name, ".zip")
-	}
-	files = utils.Filter(files, filterFunc)
-	data := utils.PageData{
-		Title:  folderId,
-		Album:  albumId,
-		Folder: folderId,
-		Files:  files,
-	}
-	utils.RenderTemplate(w, templateName, data)
+	views.Folder(album, &folder, images).Render(r.Context(), w)
 }

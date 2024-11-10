@@ -13,6 +13,8 @@ __debug*
 build/
 bin/
 tmp/
+views/*.go
+
 
 
 # Test binary, built with `go test -c`

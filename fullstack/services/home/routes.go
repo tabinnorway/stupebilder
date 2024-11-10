@@ -1,19 +1,19 @@
 package home
 
 import (
-	"database/sql"
 	"net/http"
 	"path/filepath"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/tabinnorway/stupebilder/utils"
+	"github.com/jmoiron/sqlx"
+	"github.com/tabinnorway/stupebilder/views"
 )
 
 type Handler struct {
-	db *sql.DB
+	db *sqlx.DB
 }
 
-func NewHandler(db *sql.DB) *Handler {
+func NewHandler(db *sqlx.DB) *Handler {
 	return &Handler{
 		db: db,
 	}
@@ -25,7 +25,7 @@ func (h *Handler) RegisterRoutes(r chi.Router) {
 }
 
 func (h *Handler) getHomePage(w http.ResponseWriter, r *http.Request) {
-	utils.RenderTemplate(w, "index.html", utils.PageData{Title: "Please enter key"})
+	views.Home().Render(r.Context(), w)
 }
 
 func (h *Handler) getCss(w http.ResponseWriter, r *http.Request) {

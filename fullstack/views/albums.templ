@@ -1,0 +1,14 @@
+package views
+
+import (
+    "github.com/tabinnorway/stupebilder/models"
+    "github.com/tabinnorway/stupebilder/components"
+)
+
+templ Albums(albums *[]models.Album) {
+	@Page(nil, nil) {
+		for _, album := range *albums {
+            @components.AlbumTile(&album)
+		}
+	}
+}

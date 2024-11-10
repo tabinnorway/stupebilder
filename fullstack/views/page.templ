@@ -1,0 +1,71 @@
+package views
+
+import "github.com/tabinnorway/stupebilder/models"
+
+templ Page(album *models.Album, folder *models.Folder) {
+    <!DOCTYPE html>
+    <html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Stupebilder</title>
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+        <link rel="stylesheet" type="text/css" href="/style/main.css">
+
+        <script>
+            function setTheCookie() {
+                var p = document.getElementById('userInput').value;
+                setCookie('bstkpasskey', p, 30)
+                window.location = "/albums";
+            }
+            function setCookie(name, value, days) {
+                const expires = new Date(Date.now() + days * 864e5).toUTCString();
+                document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires}; path=/`;
+            }
+            function clickedDownload() {
+                debugger;
+                var ttt = document.getElementById('values');
+                var albumId = ttt?.dataset?.albumid;
+                var folderId = ttt?.dataset?.folderid;
+                window.open(`/folders/${albumId}/${folderId}/download`, '_blank');
+            }
+        </script>
+    </head>
+
+    <body>
+        if album != nil && folder != nil {
+            <div id="values" data-albumid={album.Id} data-folderid={folder.Id} hidden></div>
+        }
+        <header id="page-header">
+            <div>
+            if album == nil && folder == nil {
+                <h1>Stupebilder</h1>
+            }
+            if album != nil && folder == nil {
+                <h1>Stupebilder - {album.Title}</h1>
+            }
+            if album != nil && folder != nil {
+                <h1>Stupebilder - {folder.Title}</h1>
+            }
+            </div>
+            if album != nil && folder != nil {
+                <div style="position: absolute; right: 0;margin-right: 30px;z-index: 10000; color: #ddd; cursor: pointer;" onclick="clickedDownload()">
+                    <i class="material-icons" title="Last ned alle bildene" style="color:#c2c2c2;">download</i>
+                </div>
+            }
+        </header>
+        <div class="container">
+            <aside id="sidebar"></aside>
+            <main id="content">
+                <div style="display: flex;flex-flow: row wrap; justify-content: space-around;">
+                    { children... }
+                </div>
+            </main>
+            <footer id="page-footer">
+                <p>&copy; 2024, Terje</p>
+            </footer>
+        </div>
+    </body>
+    </html>
+}

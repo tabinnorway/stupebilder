@@ -7,8 +7,11 @@ PACKAGE_NAME=dist.zip
 # Default target: builds the binary
 all: build
 
+templ:
+	templ generate
+
 # Build the Go binary
-build:
+build:  templ
 	mkdir -p $(BUILD_DIR)
 	GOOS=linux GOARCH=amd64 go build -o $(BUILD_DIR)/$(BINARY_NAME) $(SRC_DIR)
 

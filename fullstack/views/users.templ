@@ -1,0 +1,14 @@
+package views
+
+import (
+    "github.com/tabinnorway/stupebilder/models"
+    "github.com/tabinnorway/stupebilder/components"
+)
+
+templ Users(users *[]models.User) {
+	@Page(nil, nil) {
+		for _, user := range *users {
+            @components.UserTile(&user)
+		}
+	}
+}

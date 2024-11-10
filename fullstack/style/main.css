@@ -137,3 +137,107 @@ nav#main-menu>ul {
 	margin-top: 3px;
 	color: #ccc;
 }
+
+.user-card {
+	width: 200px;
+	height: 120px;
+	background-color: rgb(24, 16, 16);
+	position: relative;
+	border: 1px solid #ccc;
+	border-radius: 15px;
+	margin: 16px;
+	text-align: center;
+	overflow: hidden;
+}
+
+.album-card {
+	width: 200px;
+	height: 180px;
+	background-color: rgb(24, 16, 16);
+	position: relative;
+	border: 1px solid #ccc;
+	border-radius: 15px;
+	margin: 16px;
+	text-align: center;
+	overflow: hidden;
+}
+
+
+.album-card>header,
+.user-card>header {
+	width: 100%;
+	height: 25px;
+	padding: 4px 50px 0 10px;
+
+	border-radius: 15px 15px 0 0;
+	background-color: rgb(24, 16, 16);
+	overflow: hidden;
+	text-overflow: ellipsis;
+	text-wrap: nowrap;
+}
+
+.album-card>header {
+	background-color: rgb(24, 16, 16);
+}
+
+.album-card>header>div,
+.user-card>header>div {
+	text-overflow: ellipsis;
+	overflow: hidden;
+}
+
+
+.user-card>article {
+	background-color: rgb(40, 32, 32);
+	width: 100%;
+	height: 64px;
+	padding-top: 4px;
+	overflow: hidden;
+	padding: 3px 10px;
+}
+
+.user-card>footer {
+	width: 100%;
+	padding-top: 4px;
+
+	border-radius: 0 0 15px 15px;
+	background-color: rgb(24, 16, 16);
+}
+
+.album-card>article {
+	background-color: rgb(63, 0, 0);
+	width: 100%;
+	height: 130px;
+}
+
+.album-card>footer {
+	width: 100%;
+	padding-top: 4px;
+
+	border-radius: 0 0 15px 15px;
+	background-color: rgb(24, 16, 16);
+}
+
+.card-item {
+	max-width: 200px;
+	max-height: 23px;
+	overflow: hidden;
+	display: flex;
+	align-items: center;
+	text-wrap: nowrap;
+	text-overflow: ellipsis;
+}
+
+.card-item i {
+	margin-right: 10px;
+	color: #ccc;
+}
+
+.card-item i:hover {
+	color: white;
+}
+
+a.invisi-a {
+	color: #ccc;
+	text-decoration: none;
+}

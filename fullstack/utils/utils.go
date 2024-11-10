@@ -2,24 +2,35 @@ package utils
 
 import (
 	"archive/zip"
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"image"
 	"image/jpeg"
 	"io"
-	"log"
 	"net/http"
 	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
-	"text/template"
+
+	"github.com/btcsuite/btcutil/base58"
+	"github.com/lithammer/shortuuid/v4"
+	"github.com/tabinnorway/stupebilder/models"
 
 	"github.com/google/uuid"
 	resizer "github.com/nfnt/resize"
 )
 
-// var Validate = validator.New()
+type base58Encoder struct{}
+
+func (enc base58Encoder) Encode(u uuid.UUID) string {
+	return base58.Encode(u[:])
+}
+
+func (enc base58Encoder) Decode(s string) (uuid.UUID, error) {
+	return uuid.FromBytes(base58.Decode(s))
+}
 
 func WriteJSON(w http.ResponseWriter, status int, v any) error {
 	w.Header().Add("Content-Type", "application/json; charset=utf-8")
@@ -225,13 +236,17 @@ type PageData struct {
 	Title  string
 	Album  string
 	Folder string
-	Files  []FileInfo
+	Images []models.Image
 }
 
 type AlbumInfo struct {
 	Title    string
 	Location string
 	Date     string
+}
+
+func CreateShortUUID() string {
+	return shortuuid.NewWithEncoder(base58Encoder{})
 }
 
 func FindAlbumThub(albumPath string) string {
@@ -269,21 +284,9 @@ func FindFolderThumb(albumPath string, folderName string) string {
 	return " /mnt/familyshare/images/generic-thumb.jpg"
 }
 
-// renderTemplate parses and executes templates with a common layout
-func RenderTemplate(w http.ResponseWriter, tmpl string, data PageData) {
-	templates, err := template.ParseFiles(
-		"templates/layout.html",
-		filepath.Join("templates", tmpl),
-	)
-	if err != nil {
-		http.Error(w, "Error loading templates", http.StatusInternalServerError)
-		log.Println("Template parsing error:", err)
-		return
+func NullString(val *string) sql.NullString {
+	if val != nil {
+		return sql.NullString{String: *val, Valid: true}
 	}
-
-	err = templates.Execute(w, data)
-	if err != nil {
-		http.Error(w, "Error rendering template", http.StatusInternalServerError)
-		log.Println("Template execution error:", err)
-	}
+	return sql.NullString{Valid: false}
 }

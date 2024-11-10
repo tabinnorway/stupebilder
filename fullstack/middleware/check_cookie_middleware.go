@@ -12,6 +12,10 @@ func CheckCookieMiddleware(cookieName string) func(http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			// We don't require a passkey for the root URL
 			// For all other URLS, we need a passkey
+			if r.Header.Get("bstkpasskey") == "bstkbilder" {
+				next.ServeHTTP(w, r)
+			}
+
 			cookie, err := r.Cookie(cookieName)
 			if err != nil || cookie.Value != "bstkbilder" {
 				if r.RequestURI == "/" || strings.HasPrefix(r.RequestURI, "/style") {

@@ -1,0 +1,15 @@
+package views
+
+import (
+    "github.com/tabinnorway/stupebilder/models"
+    "github.com/tabinnorway/stupebilder/components"
+)
+
+
+templ Folder(album *models.Album, folder *models.Folder, images []models.Image) {
+	@Page(album, folder) {
+		for _, entry := range images {
+			@components.ImageTile(album, folder, &entry)
+		}
+	}
+}

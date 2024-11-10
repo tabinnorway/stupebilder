@@ -1,5 +1,5 @@
 create table users (
-    id                  serial primary key,
+    id                  varchar(36) unique not null,
     created_at          timestamp not null,
     updated_at          timestamp,
     email               varchar(128) unique not null,
@@ -9,11 +9,11 @@ create table users (
     last_name           varchar(128) not null,
     primary_phone       varchar(64),
     confirmed           boolean not null default false,
-    primary_club_id     int
+    primary_club_id     varchar(36) 
 );
 
 create table clubs (
-    id                  serial primary key,
+    id                  varchar(36) unique not null,
     created_at          timestamp not null,
     updated_at          timestamp null,
     email               varchar(128) not null,
@@ -24,7 +24,7 @@ create table clubs (
     postal_code         varchar(16),
     city                varchar(255),
     country_id          int,
-    primary_contact_id  int
+    primary_contact_id  varchar(36) 
 );
 
 create table countries
@@ -42,13 +42,13 @@ create table countries
 
 create table albums
 (
-    id                   serial primary key,
+    id                   varchar(36) unique not null,
     created_at           timestamp not null,
     updated_at           timestamp,
     album_folder         varchar(4096) not null unique,
-    title                varchar(128),
+    title                varchar(128) not null,
     datestring           varchar(32),
-    owner_id             int
+    owner_id             varchar(36)
 );
 
 alter table clubs

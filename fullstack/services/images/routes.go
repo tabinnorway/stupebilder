@@ -2,23 +2,38 @@ package images
 
 import (
 	"net/http"
+	"path/filepath"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/tabinnorway/stupebilder/interfaces"
+	"github.com/tabinnorway/stupebilder/utils"
 )
 
 type Handler struct {
-	imgRoot string
+	albumStore  interfaces.AlbumStore
+	folderStore interfaces.FolderStore
 }
 
-func NewHandler(imgRoot string) *Handler {
-	return &Handler{imgRoot: imgRoot}
+func NewHandler(as interfaces.AlbumStore, fs interfaces.FolderStore) *Handler {
+	return &Handler{albumStore: as, folderStore: fs}
 }
 
 func (h *Handler) RegisterRoutes(r chi.Router) {
-	r.Get("/users", h.getUsers)
+	r.Get("/{albumId}/{folderId}/{imageFile}", h.getImage)
 }
 
-func (h *Handler) getUsers(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) getImage(w http.ResponseWriter, r *http.Request) {
+	albumId := chi.URLParam(r, "albumId")
+	folderId := chi.URLParam(r, "folderId")
+	imageFile := chi.URLParam(r, "imageFile")
+
+	album, err := h.albumStore.GetByID(albumId)
+	if err != nil {
+		utils.WriteError(w, http.StatusNotFound, nil)
+		return
+	}
+	path := filepath.Join(album.AlbumFolder, "images", folderId, imageFile)
+
 	w.Header().Set("Content-Type", "image/jpeg")
-	http.ServeFile(w, r, "")
+	http.ServeFile(w, r, path)
 }

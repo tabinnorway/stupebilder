@@ -1,0 +1,27 @@
+package components
+
+import (
+    "github.com/tabinnorway/stupebilder/models"
+)
+
+
+templ UserTile(user *models.User) {
+    <div style="" class="user-card">
+        <header>
+            <div>{user.FirstName} {user.LastName}</div>
+        </header>
+        <article>
+            <div class="card-item">
+                <i class="material-icons">email</i>
+                {user.Email}
+            </div>
+            if user.PrimaryPhone.Valid {
+                <div class="card-item">
+                    <i class="material-icons">phone</i>
+                    {user.PrimaryPhone.String}
+                </div>
+            }
+        </article>
+        <footer>{user.PrimaryClub.ClubName}</footer>
+    </div>
+}

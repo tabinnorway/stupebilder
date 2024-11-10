@@ -5,15 +5,18 @@ import (
 	"path/filepath"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/tabinnorway/stupebilder/interfaces"
 	"github.com/tabinnorway/stupebilder/utils"
 )
 
 type Handler struct {
-	imgRoot string
+	imgRoot     string
+	albumStore  interfaces.AlbumStore
+	fodlerStore interfaces.FolderStore
 }
 
-func NewHandler(imgRoot string) *Handler {
-	return &Handler{imgRoot: imgRoot}
+func NewHandler(imgRoot string, as interfaces.AlbumStore, fs interfaces.FolderStore) *Handler {
+	return &Handler{imgRoot: imgRoot, albumStore: as, fodlerStore: fs}
 }
 
 func (h *Handler) RegisterRoutes(r chi.Router) {
@@ -46,7 +49,14 @@ func (h *Handler) getThumb(w http.ResponseWriter, r *http.Request) {
 	albumId := chi.URLParam(r, "albumId")
 	folderId := chi.URLParam(r, "folderId")
 	image := chi.URLParam(r, "image")
-	thumbPath := filepath.Join(h.imgRoot, albumId, "thumbnails", folderId, image)
+
+	album, err := h.albumStore.GetByID(albumId)
+	if err != nil {
+		utils.WriteError(w, http.StatusNotFound, nil)
+		return
+	}
+
+	thumbPath := filepath.Join(album.AlbumFolder, "thumbnails", folderId, image)
 
 	w.Header().Set("Content-Type", "image/jpeg")
 	http.ServeFile(w, r, thumbPath)

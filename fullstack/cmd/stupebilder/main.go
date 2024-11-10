@@ -7,10 +7,10 @@ import (
 	"os"
 	"time"
 
-	"database/sql"
+	"github.com/jmoiron/sqlx"
+	_ "github.com/lib/pq"
 
 	"github.com/joho/godotenv"
-	_ "github.com/lib/pq" // PostgreSQL driver
 
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/chi/v5"
@@ -24,7 +24,8 @@ import (
 	"github.com/tabinnorway/stupebilder/services/users"
 )
 
-var IMG_ROOT = "/mnt/familyshare/images"
+// var IMG_ROOT = "/mnt/familyshare/images"
+var IMG_ROOT = "/mnt/c/Users/tberg/Documents/Stupebilder"
 var HOME_BASE = "/home/tberg/dev.p/bstk/stupebilder.no/fullstack"
 
 func createConnectionString() string {
@@ -45,11 +46,15 @@ func main() {
 		log.Fatal("Error loading .env file")
 	}
 
-	db, err := sql.Open("postgres", createConnectionString())
+	db, err := sqlx.Connect("postgres", createConnectionString())
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer db.Close()
+	if err := db.Ping(); err != nil {
+		log.Fatalf("Could not connect to DB: %s", err.Error())
+	}
+	log.Println("Connected to DB")
 
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
@@ -67,12 +72,14 @@ func main() {
 		MaxAge:           300, // Maximum value not ignored by any of major browsers
 	}))
 
+	albumStore := albums.NewStore(db)
+	folderStore := folders.NewStore(db)
 	r.Route("/", home.NewHandler(db).RegisterRoutes)
-	r.Route("/albums", albums.NewHandler(IMG_ROOT).RegisterRoutes)
-	r.Route("/folders", folders.NewHandler(IMG_ROOT).RegisterRoutes)
-	r.Route("/thumbs", thumbs.NewHandler(IMG_ROOT).RegisterRoutes)
-	r.Route("/images", images.NewHandler(IMG_ROOT).RegisterRoutes)
-	r.Route("/users", users.NewHandler(db).RegisterRoutes)
+	r.Route("/albums", albums.NewHandler(albumStore).RegisterRoutes)
+	r.Route("/folders", folders.NewHandler(albumStore, folderStore).RegisterRoutes)
+	r.Route("/thumbs", thumbs.NewHandler(IMG_ROOT, albumStore, folderStore).RegisterRoutes)
+	r.Route("/images", images.NewHandler(albumStore, folderStore).RegisterRoutes)
+	r.Route("/users", users.NewHandler(users.NewStore(db)).RegisterRoutes)
 
 	listenPort := fmt.Sprintf(":%s", os.Getenv("LISTEN_PORT"))
 
