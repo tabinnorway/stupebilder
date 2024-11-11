@@ -8,7 +8,11 @@ import (
 type Club struct {
 	Id               string         `db:"id" json:"id"`
 	CreatedAt        time.Time      `db:"created_at" json:"createdAt"`
+	CreatedBy        string         `db:"created_by" json:"createdBy"`
 	UpdatedAt        sql.NullTime   `db:"updated_at" json:"updatedAt"`
+	UpdatedBy        *string        `db:"updated_by" json:"updatedBy"`
+	DeletedAt        sql.NullTime   `db:"deleted_at" json:"DeletedAt"`
+	DeletedBy        *string        `db:"deleted_by" json:"DeletedBy"`
 	Email            string         `db:"email" json:"email"`
 	ClubName         string         `db:"club_name" json:"clubName"`
 	ShortName        string         `db:"short_name" json:"shortName"`

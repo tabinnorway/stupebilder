@@ -16,7 +16,6 @@ import (
 
 	"github.com/btcsuite/btcutil/base58"
 	"github.com/lithammer/shortuuid/v4"
-	"github.com/tabinnorway/stupebilder/models"
 
 	"github.com/google/uuid"
 	resizer "github.com/nfnt/resize"
@@ -236,7 +235,7 @@ type PageData struct {
 	Title  string
 	Album  string
 	Folder string
-	Images []models.Image
+	Images []string
 }
 
 type AlbumInfo struct {

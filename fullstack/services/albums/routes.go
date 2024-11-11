@@ -65,7 +65,7 @@ func (h *Handler) getAlbumThumb(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		utils.WriteError(w, http.StatusNotFound, nil)
 	}
-	thumbPath := fmt.Sprintf("%s/thumb.jpg", album.AlbumFolder)
+	thumbPath := fmt.Sprintf("%s/thumb.jpg", album.AlbumPath)
 	w.Header().Set("Content-Type", "image/jpeg")
 	http.ServeFile(w, r, thumbPath)
 }
@@ -81,7 +81,7 @@ func (h *Handler) getAlbumFolders(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		utils.WriteError(w, http.StatusNotFound, nil)
 	}
-	foldersPath := filepath.Join(album.AlbumFolder, "images")
+	foldersPath := filepath.Join(album.AlbumPath, "images")
 	entries, err := os.ReadDir(foldersPath)
 	if err != nil {
 		utils.WriteError(w, http.StatusNotFound, nil)
@@ -114,7 +114,7 @@ func (h *Handler) getAlbumFolderThumb(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	file := utils.FindFolderThumb(album.AlbumFolder, folderName)
+	file := utils.FindFolderThumb(album.AlbumPath, folderName)
 	w.Header().Set("Content-Type", "image/jpeg")
 	http.ServeFile(w, r, file)
 }

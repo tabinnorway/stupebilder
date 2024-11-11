@@ -6,29 +6,33 @@ import (
 )
 
 type Album struct {
-	Id          string         `db:"id" json:"id"`
-	CreatedAt   time.Time      `db:"created_at" json:"createdAt"`
-	UpdatedAt   sql.NullTime   `db:"updated_at" json:"updatedAt"`
-	AlbumFolder string         `db:"album_folder" json:"albumFolder"`
-	Title       string         `db:"title" json:"title"`
-	Datestring  sql.NullString `db:"datestring" json:"datestring"`
-	OwnerId     sql.NullInt32  `db:"owner_id" json:"ownerId"`
+	Id         string         `db:"id" json:"id"`
+	CreatedAt  time.Time      `db:"created_at" json:"createdAt"`
+	CreatedBy  string         `db:"created_by" json:"createdBy"`
+	UpdatedAt  sql.NullTime   `db:"updated_at" json:"updatedAt"`
+	UpdatedBy  *string        `db:"updated_by" json:"updatedBy"`
+	DeletedAt  sql.NullTime   `db:"deleted_at" json:"DeletedAt"`
+	DeletedBy  *string        `db:"deleted_by" json:"DeletedBy"`
+	AlbumPath  string         `db:"album_path" json:"albumFolder"`
+	Title      string         `db:"title" json:"title"`
+	Datestring sql.NullString `db:"datestring" json:"datestring"`
+	OwnerId    sql.NullInt32  `db:"owner_id" json:"ownerId"`
 }
 
 type AlbumCreateDTO struct {
-	AlbumFolder string  `db:"album_folder" json:"albumFolder"`
-	Title       string  `db:"title" json:"title"`
-	Datestring  *string `db:"datestring" json:"datestring"`
+	AlbumPath  string  `db:"album_path" json:"albumFolder"`
+	Title      string  `db:"title" json:"title"`
+	Datestring *string `db:"datestring" json:"datestring"`
 }
 
 func (m *AlbumCreateDTO) ToModel() *Album {
 	album := Album{
-		Id:          "",
-		CreatedAt:   time.Time{},
-		UpdatedAt:   sql.NullTime{Valid: false},
-		AlbumFolder: m.AlbumFolder,
-		Title:       m.Title,
-		Datestring:  sql.NullString{Valid: false},
+		Id:         "",
+		CreatedAt:  time.Time{},
+		UpdatedAt:  sql.NullTime{Valid: false},
+		AlbumPath:  m.AlbumPath,
+		Title:      m.Title,
+		Datestring: sql.NullString{Valid: false},
 	}
 	return &album
 }

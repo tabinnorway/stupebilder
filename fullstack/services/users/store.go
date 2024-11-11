@@ -49,12 +49,18 @@ func (s *Store) GetBuEmail(email string) (*models.User, error) {
 
 func (s Store) Create(user models.User) (*models.User, error) {
 	newId := utils.CreateShortUUID()
+
+	createdBy := "terje@bergesen.info"
+	if len(user.CreatedByEmail) > 0 {
+		createdBy = user.CreatedByEmail
+	}
+
 	sql := `insert into users(
-			id, created_at, email, passwd, username, first_name, last_name, primary_phone
+			id, created_at, created_by_email, email, passwd, username, first_name, last_name, primary_phone
 		) values (
-		 	$1 current_timestamp, $2, $3, $4, $5, $6, $7, $6
+		 	$1, current_timestamp, $2, $3, $4, $5, $6, $7, $8
 		)`
-	_, err := s.db.Exec(sql, newId, user.Email, user.Password, user.Username, user.FirstName, user.LastName, user.PrimaryPhone)
+	_, err := s.db.Exec(sql, newId, createdBy, user.Email, user.Password, user.Username, user.FirstName, user.LastName, user.PrimaryPhone)
 	if err != nil {
 		return nil, err
 	}

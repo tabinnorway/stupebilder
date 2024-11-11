@@ -43,7 +43,7 @@ func (h *Handler) downloadZip(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	foldersPath := filepath.Join(album.AlbumFolder, "images", folderId)
+	foldersPath := filepath.Join(album.AlbumPath, "images", folderId)
 	zipFile := filepath.Join(foldersPath, "images.zip")
 	if _, err := os.Stat(zipFile); err == nil {
 		contentDisposition := fmt.Sprintf("attachment; filename=%s-images.zip", folderId)
@@ -68,7 +68,7 @@ func (h *Handler) getFolderById(w http.ResponseWriter, r *http.Request) {
 		utils.WriteError(w, http.StatusNotFound, nil)
 		return
 	}
-	foldersPath := filepath.Join(album.AlbumFolder, "images", folderId)
+	foldersPath := filepath.Join(album.AlbumPath, "images", folderId)
 	folder := models.Folder{Id: folderId, Title: folderId}
 	fmt.Println(foldersPath)
 	entries, err := os.ReadDir(foldersPath)

@@ -44,13 +44,13 @@ func (s Store) Create(data models.Album) (*models.Album, error) {
 	sql := `insert into albums(
 			id,
 			created_at,
-			album_folder,
+			album_path,
 			title,
 			datestring
 		) values (
 		 	$1, current_timestamp, $2, $3, $4
 		)`
-	_, err := s.db.Exec(sql, newId, data.AlbumFolder, data.Title, data.Datestring)
+	_, err := s.db.Exec(sql, newId, data.AlbumPath, data.Title, data.Datestring)
 	if err != nil {
 		return nil, err
 	}
@@ -63,36 +63,9 @@ func (s Store) Create(data models.Album) (*models.Album, error) {
 }
 
 func (s *Store) Delete(id string) (*models.User, error) {
-	// user, err := s.GetByID(id)
-	// if err != nil {
-	// 	return nil, err
-	// }
-	// if user == nil {
-	// 	return nil, fmt.Errorf("not found")
-	// }
-	// sql := "DELETE FROM users where id = $1"
-	// _, err = s.db.Exec(sql, id)
-	// if err != nil {
-	// 	return nil, err
-	// }
-	// return s.GetByID((id))
 	return nil, nil
 }
 
 func (s *Store) Update(id string, user *models.User) (*models.User, error) {
-	// sql := `update users set updated_at = current_timestamp,
-	// 			email = $1,
-	// 			passwd = $2,
-	// 			username = $3,
-	// 			first_name = $4,
-	// 			last_name = $5,
-	// 			primary_phone = $6,
-	// 			primary_club_id = $7
-	// 		where id = $8`
-	// _, err := s.db.Exec(sql, user.Email, user.Password, user.Username, user.FirstName, user.LastName, user.PrimaryPhone, user.PrimaryClubId, id)
-	// if err != nil {
-	// 	return nil, err
-	// }
-	// return s.GetByID((id))
 	return nil, nil
 }

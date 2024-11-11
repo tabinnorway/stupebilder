@@ -32,7 +32,7 @@ func (h *Handler) getImage(w http.ResponseWriter, r *http.Request) {
 		utils.WriteError(w, http.StatusNotFound, nil)
 		return
 	}
-	path := filepath.Join(album.AlbumFolder, "images", folderId, imageFile)
+	path := filepath.Join(album.AlbumPath, "images", folderId, imageFile)
 
 	w.Header().Set("Content-Type", "image/jpeg")
 	http.ServeFile(w, r, path)

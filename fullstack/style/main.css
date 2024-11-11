@@ -240,4 +240,28 @@ nav#main-menu>ul {
 a.invisi-a {
 	color: #ccc;
 	text-decoration: none;
+	cursor: pointer;
+	z-index: 10000
+}
+
+.header-content {
+	width: 100vh !important;
+	min-width: 1024px;
+	display: flex;
+	flex-direction: row;
+	vertical-align: middle;
+	height: 100%;
+}
+
+.header-content>i {
+	vertical-align: middle;
+	text-align: center;
+	margin-right: 30px;
+	font-size: 36px;
+	margin-top: 10px;
+}
+
+.header-content>h1 {
+	vertical-align: middle;
+	margin-top: 12px;
 }

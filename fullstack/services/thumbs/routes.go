@@ -56,7 +56,7 @@ func (h *Handler) getThumb(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	thumbPath := filepath.Join(album.AlbumFolder, "thumbnails", folderId, image)
+	thumbPath := filepath.Join(album.AlbumPath, "thumbnails", folderId, image)
 
 	w.Header().Set("Content-Type", "image/jpeg")
 	http.ServeFile(w, r, thumbPath)
