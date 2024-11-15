@@ -1,7 +1,11 @@
 package albums
 
 import (
+	"fmt"
 	"log"
+	"os"
+	"strings"
+	"time"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/tabinnorway/stupebilder/models"
@@ -39,27 +43,51 @@ func (s *Store) GetThumb(id string) string {
 	return ""
 }
 
-func (s Store) Create(data models.Album) (*models.Album, error) {
-	newId := utils.CreateShortUUID()
-	sql := `insert into albums(
-			id,
-			created_at,
-			album_path,
-			title,
-			datestring
-		) values (
-		 	$1, current_timestamp, $2, $3, $4
-		)`
-	_, err := s.db.Exec(sql, newId, data.AlbumPath, data.Title, data.Datestring)
+func importFolder(album models.Album) {
+	if !utils.DirExists(album.AlbumPath) {
+		return
+	}
+	entries, err := os.ReadDir(album.AlbumPath)
 	if err != nil {
-		return nil, err
+		return
 	}
 
-	created, err := s.GetByID(newId)
-	if err != nil {
-		return nil, err
+	for _, entry := range entries {
+		if entry.IsDir() && !strings.HasPrefix(entry.Name(), ".") {
+			fmt.Printf("Doing folder: %s\n", entry.Name())
+			time.Sleep(1 * time.Second)
+		}
 	}
-	return created, nil
+}
+
+func (s Store) Create(data models.Album) (*models.Album, error) {
+	if !utils.DirExists(data.AlbumPath) {
+		return nil, fmt.Errorf("folder path does not exist")
+	}
+	go importFolder(data)
+	fmt.Println("Started myFunction as a Goroutine")
+	return nil, fmt.Errorf("not yet ready")
+
+	// sql := `insert into albums(
+	// 		id,
+	// 		created_at,
+	// 		album_path,
+	// 		title,
+	// 		datestring
+	// 	) values (
+	// 	 	$1, current_timestamp, $2, $3, $4
+	// 	)`
+	// newId := utils.CreateShortUUID()
+	// _, err := s.db.Exec(sql, newId, data.AlbumPath, data.Title, data.Datestring)
+	// if err != nil {
+	// 	return nil, err
+	// }
+
+	// created, err := s.GetByID(newId)
+	// if err != nil {
+	// 	return nil, err
+	// }
+	// return created, nil
 }
 
 func (s *Store) Delete(id string) (*models.User, error) {

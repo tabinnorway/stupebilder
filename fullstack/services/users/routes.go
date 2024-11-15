@@ -2,14 +2,12 @@ package users
 
 import (
 	"encoding/json"
-	"log"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/tabinnorway/stupebilder/dtos/users"
 	"github.com/tabinnorway/stupebilder/interfaces"
 	"github.com/tabinnorway/stupebilder/utils"
-	"github.com/tabinnorway/stupebilder/views"
 )
 
 type Handler struct {
@@ -26,11 +24,11 @@ func (h *Handler) RegisterRoutes(r chi.Router) {
 }
 
 func (h *Handler) getAll(w http.ResponseWriter, r *http.Request) {
-	users, err := h.store.GetAll()
-	if err != nil {
-		log.Printf("error getting users: %s", err.Error())
-	}
-	views.Users(&users).Render(r.Context(), w)
+	// users, err := h.store.GetAll()
+	// if err != nil {
+	// 	log.Printf("error getting users: %s", err.Error())
+	// }
+	// views.Users(&users).Render(r.Context(), w)
 }
 
 func (h *Handler) createUser(w http.ResponseWriter, r *http.Request) {

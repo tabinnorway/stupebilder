@@ -50,6 +50,7 @@ func (h *Handler) createAlbum(w http.ResponseWriter, r *http.Request) {
 	newUser, err := h.store.Create(*data.ToModel())
 	if err != nil {
 		utils.WriteError(w, http.StatusInternalServerError, err)
+		return
 	}
 	utils.WriteJSON(w, http.StatusOK, newUser)
 

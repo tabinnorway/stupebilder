@@ -9,6 +9,7 @@
 *.dylib
 *.zip
 __debug*
+*secret*
 
 build/
 bin/

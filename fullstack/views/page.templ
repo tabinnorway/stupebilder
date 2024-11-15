@@ -53,7 +53,28 @@ templ Page(album *models.Album, folder *models.Folder) {
             }
         </header>
         <div class="container">
-            <aside id="sidebar"></aside>
+            <aside id="sidebar">
+                <div>
+                    <ul>
+                        <li>
+                            <i class="material-icons" title="Home" style="color:#c2c2c2;">home</i>
+                            <span>Home</span>
+                        </li>
+                        <li>
+                            <i class="material-icons" title="Adminiistration" style="color:#c2c2c2;">admin_panel_settings</i>
+                            <span>Admin</span>
+                        </li>
+                        <li>
+                            <i class="material-icons" title="Settings" style="color:#c2c2c2;">settings</i>
+                            <span>Settings</span>
+                        </li>
+                        <li>
+                            <i class="material-icons" title="Settings" style="color:#c2c2c2;">logout</i>
+                            <span style="text-wrap: nowrap;">Log out</span>
+                        </li>
+                    </ul>
+                </div>
+            </aside>
             <main id="content">
                 <div style="display: flex;flex-flow: row wrap; justify-content: space-around;">
                     { children... }

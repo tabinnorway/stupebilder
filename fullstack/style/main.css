@@ -265,3 +265,33 @@ a.invisi-a {
 	vertical-align: middle;
 	margin-top: 12px;
 }
+
+aside {
+	margin-top: 10px;
+}
+
+aside>div {
+	background-color: transparent;
+}
+
+aside li {
+	display: flex;
+	align-items: center;
+	list-style-type: none;
+	margin: 0 0 0 0;
+}
+
+aside li span {
+	margin-right: 8px;
+	margin-top: 12px;
+	display: inline-block;
+	width: 24px;
+	height: 24px;
+}
+
+aside li i {
+	margin-right: 8px;
+	display: inline-block;
+	width: 24px;
+	height: 24px;
+}
