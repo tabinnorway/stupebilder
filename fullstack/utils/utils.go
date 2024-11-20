@@ -248,10 +248,6 @@ func CreateShortUUID() string {
 	return shortuuid.NewWithEncoder(base58Encoder{})
 }
 
-func FindAlbumThub(albumPath string) string {
-	return filepath.Join(albumPath, "thumb.jpg")
-}
-
 func GetAlbumInfo(path string) *AlbumInfo {
 	albumInfo := new(AlbumInfo)
 	path = filepath.Join(path, "albuminfo.json")
@@ -269,15 +265,35 @@ func GetAlbumInfo(path string) *AlbumInfo {
 	return albumInfo
 }
 
+func FindAlbumThub(albumPath string) string {
+	thumbPath := filepath.Join(albumPath, "thumb.jpg")
+	if !FileExists(thumbPath) {
+		entries, err := os.ReadDir(albumPath)
+		if err != nil {
+			return thumbPath
+		}
+		for _, entry := range entries {
+			if !strings.HasPrefix(entry.Name(), ".") && strings.HasSuffix(entry.Name(), ".jpg") {
+				return filepath.Join(albumPath, entry.Name())
+			}
+			if entry.IsDir() && !strings.HasPrefix(entry.Name(), ".") {
+				return FindAlbumThub(filepath.Join(albumPath, entry.Name()))
+			}
+		}
+	}
+
+	return filepath.Join(thumbPath, "thumb.jpg")
+}
+
 func FindFolderThumb(albumPath string, folderName string) string {
-	path := filepath.Join(albumPath, "thumbnails", folderName)
+	path := filepath.Join(albumPath, "Thumbs", folderName)
 	files, err := os.ReadDir(path)
 	if err != nil {
 		return " /mnt/familyshare/images/generic-thumb.jpg"
 	}
 	for _, elem := range files {
-		if !elem.IsDir() && strings.HasSuffix(elem.Name(), "jpg") {
-			return filepath.Join(albumPath, "thumbnails", folderName, elem.Name())
+		if !elem.IsDir() && strings.HasSuffix(elem.Name(), ".jpg") && !strings.HasPrefix(elem.Name(), ".") {
+			return filepath.Join(albumPath, "Thumbs", folderName, elem.Name())
 		}
 	}
 	return " /mnt/familyshare/images/generic-thumb.jpg"

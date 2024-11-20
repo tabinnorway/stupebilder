@@ -2,6 +2,10 @@ package interfaces
 
 import "github.com/tabinnorway/stupebilder/models"
 
+type AuthStore interface {
+	DoAuth() error
+}
+
 type UserStore interface {
 	GetAll() ([]models.User, error)
 	GetByID(id string) (*models.User, error)

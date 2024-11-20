@@ -38,10 +38,10 @@ templ Page(album *models.Album, folder *models.Folder) {
         }
         <header id="page-header">
             if album == nil && folder == nil {
-                <h1>Stupebilder</h1>
+                <a href="/" class="invisi-a"><h1>Stupebilder</h1></a> 
             }
             if album != nil && folder == nil {
-                <h1>Stupebilder</h1>
+                <a href="/" class="invisi-a"><h1>Stupebilder</h1></a> 
             }
             if album != nil && folder != nil {
                 <h1>Stupebilder - {folder.Title}</h1>
@@ -58,7 +58,7 @@ templ Page(album *models.Album, folder *models.Folder) {
                     <ul>
                         <li>
                             <i class="material-icons" title="Home" style="color:#c2c2c2;">home</i>
-                            <span>Home</span>
+                            <a href="/" class="invisi-a"><span>Home</span></a>
                         </li>
                         <li>
                             <i class="material-icons" title="Adminiistration" style="color:#c2c2c2;">admin_panel_settings</i>
@@ -69,8 +69,8 @@ templ Page(album *models.Album, folder *models.Folder) {
                             <span>Settings</span>
                         </li>
                         <li>
-                            <i class="material-icons" title="Settings" style="color:#c2c2c2;">logout</i>
-                            <span style="text-wrap: nowrap;">Log out</span>
+                            <i class="material-icons" title="Settings" style="color:#c2c2c2;">login</i>
+                            <span style="text-wrap: nowrap;">Log in</span>
                         </li>
                     </ul>
                 </div>

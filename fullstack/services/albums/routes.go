@@ -66,7 +66,7 @@ func (h *Handler) getAlbumThumb(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		utils.WriteError(w, http.StatusNotFound, nil)
 	}
-	thumbPath := fmt.Sprintf("%s/thumb.jpg", album.AlbumPath)
+	thumbPath := utils.FindAlbumThub(filepath.Join(album.AlbumPath, "Thumbs"))
 	w.Header().Set("Content-Type", "image/jpeg")
 	http.ServeFile(w, r, thumbPath)
 }

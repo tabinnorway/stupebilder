@@ -5,10 +5,13 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
+	"golang.org/x/oauth2"
+	"golang.org/x/oauth2/google"
 
 	"github.com/joho/godotenv"
 
@@ -17,6 +20,7 @@ import (
 	"github.com/go-chi/cors"
 	mw "github.com/tabinnorway/stupebilder/middleware"
 	"github.com/tabinnorway/stupebilder/services/albums"
+	"github.com/tabinnorway/stupebilder/services/auth"
 	"github.com/tabinnorway/stupebilder/services/folders"
 	"github.com/tabinnorway/stupebilder/services/home"
 	"github.com/tabinnorway/stupebilder/services/images"
@@ -40,11 +44,28 @@ func createConnectionString() string {
 	return connStr
 }
 
+func getScopes(scopesId string) []string {
+	scopesString := os.Getenv(scopesId)
+	return strings.Split(scopesString, ",")
+}
+
 func main() {
 	err := godotenv.Load()
 	if err != nil {
-		log.Fatal("Error loading .env file")
+		log.Fatalf("Error loading .env file: %+v", err)
 	}
+
+	var (
+		// OAuth2 configuration
+		oauthConfig = &oauth2.Config{
+			ClientID:     os.Getenv("GOOGLE_CLIENT_ID"),
+			ClientSecret: os.Getenv("GOOGLE_CLIENT_SECRET"),
+			RedirectURL:  os.Getenv("GOOGLE_REDIRECT_URL"),
+			// Scopes:       []string{"openid", "profile", "email"},
+			Scopes:   getScopes("GOOGLE_CLIENT_SCOPES"),
+			Endpoint: google.Endpoint,
+		}
+	)
 
 	db, err := sqlx.Connect("postgres", createConnectionString())
 	if err != nil {
@@ -80,6 +101,7 @@ func main() {
 	r.Route("/thumbs", thumbs.NewHandler(IMG_ROOT, albumStore, folderStore).RegisterRoutes)
 	r.Route("/images", images.NewHandler(albumStore, folderStore).RegisterRoutes)
 	r.Route("/users", users.NewHandler(users.NewStore(db)).RegisterRoutes)
+	r.Route("/auth", auth.NewHandler(oauthConfig, auth.NewStore(db)).RegisterRoutes)
 
 	listenPort := fmt.Sprintf(":%s", os.Getenv("LISTEN_PORT"))
 
